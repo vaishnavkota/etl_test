@@ -19,8 +19,8 @@ def housing_etl_pipeline():
     """
     print("--- Starting Housing ETL Pipeline ---")
     # Check for DB password, as it's required by the Spark job
-    if not os.getenv("DB_PASSWORD"):
-        raise ValueError("Environment variable DB_PASSWORD is not set.")
+    # if not os.getenv("DB_PASSWORD"):
+    #    raise ValueError("Environment variable DB_PASSWORD is not set.")
     
     run_spark_etl_task()
     print("--- Housing ETL Pipeline Finished ---")

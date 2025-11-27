@@ -77,6 +77,12 @@ def write_to_sqlite(df):
 
 def main():
     job_start = time.time()
+    
+    # Set SPARK_HOME to the virtual environment's PySpark installation
+    # This overrides any system-wide SPARK_HOME (like Spark 4.0.1) that causes version mismatch
+    import pyspark
+    os.environ['SPARK_HOME'] = os.path.dirname(pyspark.__file__)
+
     # findspark.init()
     spark = SparkSession.builder \
         .appName("California_Housing_ETL")\

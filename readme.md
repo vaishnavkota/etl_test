@@ -74,15 +74,12 @@ python mongo_etl/mongo_job.py
 *This will read from MongoDB `admin.test_data`, partition it, and display the schema and record count.*
 
 **Step 3: Monitor with Spark History Server**
-1.  **Set Log Directory** (PowerShell):
+1.  **Start Server (PowerShell)**:
+    *   *Note: Run this from the project root `E:\Projects\etl_test_gemini_3`*
     ```powershell
-    $env:SPARK_HISTORY_OPTS="-Dspark.history.fs.logDirectory=file:/e:/Projects/etl_test_gemini_3/spark-events"
+    $env:HADOOP_HOME="E:\Projects\etl_test_gemini_3\hadoop"; $env:PATH="$env:HADOOP_HOME\bin;$env:PATH"; $env:SPARK_HISTORY_OPTS="-Dspark.history.fs.logDirectory=file:///e:/Projects/etl_test_gemini_3/spark-events"; & ".\.venv\Lib\site-packages\pyspark\bin\spark-class.cmd" org.apache.spark.deploy.history.HistoryServer
     ```
-2.  **Start Server**:
-    ```powershell
-    spark-class.cmd org.apache.spark.deploy.history.HistoryServer
-    ```
-3.  **View UI**: Open `http://localhost:18080`
+2.  **View UI**: Open `http://localhost:18080`
 
 ---
 

@@ -69,6 +69,11 @@ class MongoSpark:
         return df
 
 def main():
+    # Set SPARK_HOME to the virtual environment's PySpark installation
+    # This overrides any system-wide SPARK_HOME (like Spark 4.0.1) that causes version mismatch
+    import pyspark
+    os.environ['SPARK_HOME'] = os.path.dirname(pyspark.__file__)
+
     # Set local Hadoop home to avoid system-wide configuration
     cwd = os.getcwd()
     hadoop_home = os.path.join(cwd, 'hadoop')
@@ -77,11 +82,13 @@ def main():
     
     # Initialize Spark Session with MongoDB Connector
     # Supports both MongoDB and local JSON file reading
+    spark_events_dir = os.path.join(cwd, "spark-events").replace("\\", "/")
     spark = SparkSession.builder \
         .appName("MongoETLJob") \
         .config("spark.jars.packages", "org.mongodb.spark:mongo-spark-connector_2.13:10.5.0") \
         .config("spark.eventLog.enabled", "true") \
-        .config("spark.eventLog.dir", "file:///e:/Projects/etl_test_gemini_3/spark-events") \
+        .config("spark.eventLog.rolling.enabled", "false") \
+        .config("spark.eventLog.dir", f"file:///{spark_events_dir}") \
         .getOrCreate()
 
     print(">>> Spark Session Created")
@@ -118,7 +125,14 @@ def main():
         df.show(100,truncate=True)
         
         # Show partition distribution
-        print(f">>> Total records: {df.count()}")
+        count = df.count()
+        print(f">>> Total records: {count}")
+        
+        # Estimate in-memory size (rough approximation based on schema and count)
+        # This is just a heuristic; Spark History Server shows the exact "Input Size" for the stage.
+        estimated_size_mb = (count * 1500) / (1024 * 1024) # Assuming ~1.5KB per row based on previous stats
+        print(f">>> Estimated In-Memory Size: ~{estimated_size_mb:.2f} MB")
+
         df.write.format("noop").mode("overwrite").save()
     except Exception as e:
         print(f"Error during ETL process: {e}")

@@ -1,4 +1,5 @@
-pyspark
-prefect
-findspark
-pymongo
+pyspark==3.4.1
+prefect==3.6.4
+findspark==2.0.1
+pymongo==4.15.4
+beartype==0.22.6
